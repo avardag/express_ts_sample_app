@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import { Methods } from './Methods';
+import { MetadataKeys } from './MetadataKeys';
 
 //decorator to save path string into metadata
 // and HTTP method to metadata
@@ -17,15 +19,15 @@ function routeBinder(httpMethod: string) {
     // decorator
    return function (target: any, propKey: string, desc: PropertyDescriptor) {
     //save path string to metadata
-    Reflect.defineMetadata("path", path, target, propKey)
+    Reflect.defineMetadata(MetadataKeys.path, path, target, propKey)
     //save http method string to metadata
-    Reflect.defineMetadata("httpMethod", httpMethod, target, propKey)
+    Reflect.defineMetadata(MetadataKeys.httpMethod , httpMethod, target, propKey)
    }
  }
 }
 
-export const get = routeBinder('get')
-export const put = routeBinder('put')
-export const post = routeBinder('get')
-export const del = routeBinder('delete')
-export const patch = routeBinder('patch')
+export const get = routeBinder(Methods.get)
+export const put = routeBinder(Methods.put)
+export const post = routeBinder(Methods.get)
+export const del = routeBinder(Methods.del)
+export const patch = routeBinder(Methods.patch)

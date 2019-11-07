@@ -1,6 +1,8 @@
 import 'reflect-metadata'
 
 import { AppRouter } from '../../AppRouter';
+import { Methods } from './Methods';
+import { MetadataKeys } from './MetadataKeys';
 
 
 // decorator to be applied on class
@@ -8,17 +10,27 @@ import { AppRouter } from '../../AppRouter';
 export function controller(routePrefix:string) {
   return function (target: Function) {
     const router = AppRouter.getInstance();
-    
+
     for (const k in target.prototype) {
       //method of the class(routeHandler methods in our case)
       const routeHandler = target.prototype[k];
       //get metadata(if exists) attached to the methods
-      const path = Reflect.getMetadata('path', target.prototype, k)
+      const path = Reflect.getMetadata(
+        MetadataKeys.path, 
+        target.prototype, 
+        k
+      )
+      //get http method metadata attached to the methods
+      const httpMethod: Methods = Reflect.getMetadata(
+        MetadataKeys.httpMethod,
+        target.prototype, 
+        k
+      )
 
       if(path){
         //express router
         //combine routes and pass route handler
-        router.get(`${routePrefix}${path}`, routeHandler)
+        router[httpMethod](`${routePrefix}${path}`, routeHandler)
       }
       }
     }
