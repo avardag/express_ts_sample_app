@@ -2,3 +2,4 @@
 //import and directly export all decorators
 export * from './controller';
 export * from './routes.decorator';
+export * from './use';

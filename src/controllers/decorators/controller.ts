@@ -3,6 +3,7 @@ import 'reflect-metadata'
 import { AppRouter } from '../../AppRouter';
 import { Methods } from './Methods';
 import { MetadataKeys } from './MetadataKeys';
+import { use } from './use';
 
 
 // decorator to be applied on class
@@ -27,10 +28,17 @@ export function controller(routePrefix:string) {
         k
       )
 
+      const middlewares = Reflect.getMetadata(
+        MetadataKeys.middleware, 
+        target.prototype,
+        k
+      ) || [];
+      
       if(path){
         //express router
         //combine routes and pass route handler
-        router[httpMethod](`${routePrefix}${path}`, routeHandler)
+        //and pass MW funcs before route handler
+        router[httpMethod](`${routePrefix}${path}`, ...middlewares, routeHandler)
       }
       }
     }
