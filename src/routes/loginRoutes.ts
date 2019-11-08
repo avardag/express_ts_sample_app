@@ -61,21 +61,7 @@ router.get('/login', (req: Request, res: Response)=>{
   `)
 })
 
-router.post('/login', (req: RequestWithBody, res: Response)=>{
-  const {email, password} = req.body;
 
-  //type guard
-  if(email && password && email === 'alex@gmail.com' && password === '123'){
-    //user logged in. save in session
-    req.session = {
-      loggedIn: true
-    }
-    // redirect to root route
-    res.redirect('/')
-  }else{
-    res.send("You must provide an email and a password")
-  }
-})
 
 router.get('/logout', (req: Request, res: Response)=>{
   req.session = undefined;

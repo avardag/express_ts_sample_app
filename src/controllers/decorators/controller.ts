@@ -1,10 +1,27 @@
 import 'reflect-metadata'
-
+import {Request, Response, RequestHandler, NextFunction} from 'express'
 import { AppRouter } from '../../AppRouter';
 import { Methods } from './Methods';
 import { MetadataKeys } from './MetadataKeys';
 import { use } from './use';
 
+// MW func to check req.body values
+function bodyValidator(keys:string[]): RequestHandler {
+  return function(req: Request, res: Response, next: NextFunction){
+    if(!req.body){
+      res.status(422).send("Invalid request");
+      return
+    }
+    //loop over keys array(argument to MW func) and check if they exist
+    for (const key of keys) {
+      if(!req.body[key]){
+        res.status(422).send(`You need to provide ${key}`);
+        return;
+      }
+    }
+    next()
+  }
+}
 
 // decorator to be applied on class
 //iterates over metadata inside classes methods 
@@ -33,12 +50,24 @@ export function controller(routePrefix:string) {
         target.prototype,
         k
       ) || [];
+      //array of required boy properties(email, password, conffirmPassword etc)
+      const requiredBodyProps = Reflect.getMetadata(
+        MetadataKeys.validator, 
+        target.prototype,
+        k
+      ) || [];
+      const validator = bodyValidator(requiredBodyProps);
       
       if(path){
         //express router
         //combine routes and pass route handler
         //and pass MW funcs before route handler
-        router[httpMethod](`${routePrefix}${path}`, ...middlewares, routeHandler)
+        router[httpMethod](
+          `${routePrefix}${path}`, 
+          ...middlewares,
+          validator, 
+          routeHandler
+        )
       }
       }
     }
