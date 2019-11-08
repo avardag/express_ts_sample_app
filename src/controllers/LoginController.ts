@@ -8,6 +8,13 @@ function logger(req:Request, res: Response, next: NextFunction) {
   next();
 }
 
+interface RequestWithBody extends Request{
+  body: {
+    //keys og this obj are strings, value of that key is either a string or undefined
+    [key: string]: string | undefined
+  }
+}
+
 @controller('/auth')
 export class LoginController{
   @get('/login')
@@ -30,7 +37,7 @@ export class LoginController{
   }
   @post('/login')
   @bodyValidator('email', 'password')
-  postLogin(req: Request, res: Response):void{
+  postLogin(req: RequestWithBody, res: Response):void{
     const {email, password} = req.body;
   
     //type guard
@@ -44,5 +51,11 @@ export class LoginController{
     }else{
       res.send("You must provide an email and a password")
     }
+  }
+
+  @get('/logout')
+  getLogout(req: Request, res: Response): void{
+    req.session = undefined;
+    res.redirect('/')
   }
 }
